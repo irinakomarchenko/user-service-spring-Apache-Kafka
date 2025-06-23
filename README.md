@@ -1,11 +1,12 @@
 ![CI](https://github.com/irinakomarchenko/user-service-spring/actions/workflows/ci.yml/badge.svg)
 
-[![Maintainability](https://qlty.sh/badges/a56c7491-b9be-4239-964a-541250c083e3/maintainability.svg)](https://qlty.sh/gh/irinakomarchenko/projects/user-service-spring)
+[![Maintainability](https://qlty.sh/badges/1d96f9b0-00d7-47ce-bd3a-f03a36f33f8c/maintainability.svg)](https://qlty.sh/gh/irinakomarchenko/projects/user-service-spring-Apache-Kafka)
 
-# Notification-service
+# User Service & Notification Service
 
-**Notification-service** — REST API-сервис на Spring Boot для управления пользователями (CRUD).
-Сервис отправляет Kafka-события о создании и удалении пользователей. Эти события могут быть обработаны, например, микросервисом notification-service, который отправляет email-уведомления.
+**User Service** — микросервис на Spring Boot для управления пользователями (CRUD) и публикации событий о создании/удалении пользователей в Kafka.
+**Notification-service** —  микросервис, который слушает события из Kafka и отправляет email-уведомления пользователям. Также предоставляет API для отправки email.
+
 
 ---
 
@@ -64,3 +65,4 @@ java -jar target/user-service-spring.jar
 
 ### 7. Пример работы приложения
 ![img_1.png](readme-resources/img_1.png)
+![img_2.png](readme-resources/img_2.png)
