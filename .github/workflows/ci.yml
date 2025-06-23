@@ -35,30 +35,42 @@ jobs:
             sleep 2
           done
 
+      # Можно аналогично добавить wait for kafka/mailhog если нужно
+
       - name: Set up OpenJDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build and run tests
+      - name: Build and run tests (user-service)
         run: mvn verify
+        working-directory: ./user-service
 
-      - name: Upload JaCoCo report
+      - name: Build and run tests (notification-service)
+        run: mvn verify
+        working-directory: ./notification-service
+
+      - name: Upload JaCoCo report (user-service)
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
-          path: target/site/jacoco
+          name: jacoco-report-user-service
+          path: user-service/target/site/jacoco
 
-      - name: Upload JaCoCo coverage to Qlty Cloud
-        uses: qltysh/qlty-action/coverage@v1
+      - name: Upload JaCoCo report (notification-service)
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: target/site/jacoco/jacoco.xml
+          name: jacoco-report-notification-service
+          path: notification-service/target/site/jacoco
 
 
-      - name: Run Checkstyle
+      - name: Run Checkstyle (user-service)
         run: mvn checkstyle:check
+        working-directory: ./user-service
+
+      - name: Run Checkstyle (notification-service)
+        run: mvn checkstyle:check
+        working-directory: ./notification-service
 
       - name: Tear down Docker Compose
         if: always()

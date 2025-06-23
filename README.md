@@ -2,9 +2,10 @@
 
 [![Maintainability](https://qlty.sh/badges/a56c7491-b9be-4239-964a-541250c083e3/maintainability.svg)](https://qlty.sh/gh/irinakomarchenko/projects/user-service-spring)
 
-# User Service Spring
+# Notification-service
 
-**User Service Spring** — REST API-сервис на Spring Boot для управления пользователями (CRUD).
+**Notification-service** — REST API-сервис на Spring Boot для управления пользователями (CRUD).
+Сервис отправляет Kafka-события о создании и удалении пользователей. Эти события могут быть обработаны, например, микросервисом notification-service, который отправляет email-уведомления.
 
 ---
 
@@ -14,7 +15,9 @@
 - Spring Boot
 - Spring Web (REST API)
 - Spring Data JPA (встроенный Hibernate)
+- Spring Kafka (Kafka Producer)
 - PostgreSQL (через Docker Compose)
+- Apache Kafka (интеграция через Spring Kafka)
 - SLF4J + Logback (логирование)
 - JUnit 5 + MockMvc (тестирование контроллеров и API)
 - Maven (сборка и зависимости)
@@ -27,10 +30,10 @@
 ### 1. Клонировать репозиторий
 
 ```sh
-git clone https://github.com/ТВОЙ_ЛОГИН/user-service-hibernate.git
-cd user-service-hibernate
+git clone https://github.com/ТВОЙ_ЛОГИН/user-service-spring-Apache-Kafka.git
+cd user-service-spring-Apache Kafka
 ```
-### 2 Запустить базу данных PostgreSQL
+###  Запустить PostgreSQL и Kafka (Docker Compose)
 ```sh
 docker compose up -d
 ```
