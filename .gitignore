@@ -28,6 +28,7 @@ replay_pid*
 *.iml
 *.iws
 *.ipr
+*.cast
 out/
 
 # Maven
@@ -40,7 +41,6 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 
 # OS-specific

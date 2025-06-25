@@ -1,6 +1,7 @@
 package myuserservice.integration;
 
 import myuserservice.dto.UserDto;
+import myuserservice.entity.OutboxEventType;
 import myuserservice.entity.User;
 import myuserservice.repository.OutboxRepository;
 import myuserservice.repository.UserRepository;
@@ -54,7 +55,7 @@ class UserServiceIntegrationTest {
         var dto = UserDto.builder().name("Zoe").email("zoem@example.com").age(38).build();
         userService.createUser(dto);
         var messages = outboxRepository.findAll();
-        assertThat(messages).anyMatch(m -> m.getEventType().equals("CREATE"));
+        assertThat(messages).anyMatch(m -> m.getEventType().equals(OutboxEventType.CREATE));
     }
 
 

@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UserEventNotificDto {
-    private String operation; // "CREATE" или "DELETE"
+    private String operation;
     private String email;
 }

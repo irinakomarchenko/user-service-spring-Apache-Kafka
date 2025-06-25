@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import myuserservice.dto.UserDto;
 import myuserservice.dto.UserEventDto;
+import myuserservice.entity.OutboxEventType;
 import myuserservice.mapper.UserMapper;
 import myuserservice.entity.OutboxMessage;
 import myuserservice.entity.User;
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
         log.info("Пользователь добавлен: {}", saved);
 
 
-        saveOutboxEvent("CREATE", saved.getEmail());
+        saveOutboxEvent(OutboxEventType.CREATE, saved.getEmail());
 
         return UserMapper.toDto(saved);
     }
@@ -83,19 +84,19 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         log.info("Пользователь с id {} удалён", id);
 
-        saveOutboxEvent("DELETE", user.getEmail());
+        saveOutboxEvent(OutboxEventType.DELETE, user.getEmail());
     }
 
-    private void saveOutboxEvent(String operation, String email) {
+    private void saveOutboxEvent(OutboxEventType eventType, String email) {
         try {
             UserEventDto event = UserEventDto.builder()
-                    .operation(operation)
+                    .operation(eventType.name())
                     .email(email)
                     .build();
             String payload = objectMapper.writeValueAsString(event);
 
             OutboxMessage outbox = OutboxMessage.builder()
-                    .eventType(operation)
+                    .eventType(eventType)
                     .payload(payload)
                     .createdAt(LocalDateTime.now())
                     .processed(false)

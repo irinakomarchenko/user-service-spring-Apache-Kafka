@@ -66,3 +66,6 @@ java -jar target/user-service-spring.jar
 ### 7. Пример работы приложения
 ![img_1.png](readme-resources/img_1.png)
 ![img_2.png](readme-resources/img_2.png)
+
+[![asciicast](https://asciinema.org/a/724582.svg)](https://asciinema.org/a/724582)
+
