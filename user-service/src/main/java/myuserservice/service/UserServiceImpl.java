@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
         log.info("Пользователь добавлен: {}", saved);
 
 
-        saveOutboxEvent(OutboxEventType.CREATE, saved.getEmail());
+        sendOutboxEvent(OutboxEventType.CREATE, saved.getEmail());
 
         return UserMapper.toDto(saved);
     }
@@ -84,10 +84,10 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         log.info("Пользователь с id {} удалён", id);
 
-        saveOutboxEvent(OutboxEventType.DELETE, user.getEmail());
+        sendOutboxEvent(OutboxEventType.DELETE, user.getEmail());
     }
 
-    private void saveOutboxEvent(OutboxEventType eventType, String email) {
+    private void sendOutboxEvent(OutboxEventType eventType, String email) {
         try {
             UserEventDto event = UserEventDto.builder()
                     .operation(eventType.name())
