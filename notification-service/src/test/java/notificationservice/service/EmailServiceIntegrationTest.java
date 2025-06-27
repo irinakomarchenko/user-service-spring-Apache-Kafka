@@ -26,7 +26,7 @@ public class EmailServiceIntegrationTest {
 
         MimeMessage message = mailSender.createMimeMessage();
         message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("test@user.com"));
-        message.setFrom(new InternetAddress("noreply@yourapp.com"));
+        message.setFrom(new InternetAddress("noreply@ynotification.com"));
         message.setSubject("Test subject");
         message.setText("Hello, this is a test email!");
         mailSender.send(message);

@@ -20,6 +20,7 @@ public class EmailService {
             msg.setTo(to);
             msg.setSubject(subject);
             msg.setText(body);
+            msg.setFrom("noreply@notification-service.com");
             mailSender.send(msg);
             log.info("Письмо отправлено: to={}, subject={}", to, subject);
         } catch (Exception e) {
