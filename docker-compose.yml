@@ -87,6 +87,7 @@ services:
       - "8081:8081"
     environment:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    restart: always
 
   notification-service:
     build: ./notification-service
@@ -100,6 +101,7 @@ services:
       - "8082:8082"
     environment:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    restart: always
 
 volumes:
   db:
