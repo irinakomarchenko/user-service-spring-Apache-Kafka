@@ -34,21 +34,64 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  config-server:
+    build: ./config-server
+    depends_on:
+      - db
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-repo:/config-repo
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/config-repo
+
+  discovery-server:
+    build: ./discovery-server
+    depends_on:
+      - config-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway-api:
+    build: ./gateway-api
+    depends_on:
+      - discovery-server
+      - config-server
+      - user-service
+      - notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+
+  circuit-breaker:
+    build: ./circuit-breaker
+    depends_on:
+      - config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    ports:
+      - "8083:8083"
+
   user-service:
     build: ./user-service
     depends_on:
       - db
       - kafka
-      - mailhog
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_MAIL_HOST: mailhog
-      SPRING_MAIL_PORT: 1025
+      - config-server
+      - discovery-server
     ports:
       - "8081:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
 
   notification-service:
     build: ./notification-service
@@ -56,12 +99,13 @@ services:
       - user-service
       - kafka
       - mailhog
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_MAIL_HOST: mailhog
-      SPRING_MAIL_PORT: 1025
+      - config-server
+      - discovery-server
     ports:
       - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
 
 volumes:
   db:
