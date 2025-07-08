@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   config-server:
     build: ./config-server
@@ -7,35 +9,69 @@ services:
       - ./config-repo:/config-repo
     environment:
       SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/config-repo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  discovery-server:
+    build: ./discovery-server
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: on-failure:10
 
   db:
     image: postgres:14.1-alpine
-    restart: on-failure:5
+    restart: on-failure:10
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     depends_on:
       - zookeeper
     ports:
-      - '9092:9092'
+      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
   mailhog:
     image: mailhog/mailhog
@@ -43,65 +79,70 @@ services:
       - "1025:1025"
       - "8025:8025"
 
-  discovery-server:
-    build: ./discovery-server
-    depends_on:
-      - config-server
-    ports:
-      - "8761:8761"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    restart: on-failure:5
-
   circuit-breaker:
     build: ./circuit-breaker
     depends_on:
-      - config-server
+      config-server:
+        condition: service_healthy
     environment:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
     ports:
       - "8083:8083"
-    restart: on-failure:5
+    restart: on-failure:10
 
   user-service:
     build: ./user-service
     depends_on:
-      - db
-      - kafka
-      - config-server
-      - discovery-server
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
     ports:
       - "8081:8081"
     environment:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-    restart: on-failure:5
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/api/users" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: on-failure:10
 
   notification-service:
     build: ./notification-service
     depends_on:
-      - user-service
-      - kafka
-      - mailhog
-      - config-server
-      - discovery-server
+      user-service:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
     ports:
       - "8082:8082"
     environment:
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-    restart: on-failure:5
+    restart: on-failure:10
 
   gateway-api:
     build: ./gateway-api
     depends_on:
-      - discovery-server
-      - config-server
-      - user-service
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
     ports:
       - "8080:8080"
-    restart: on-failure:5
+    restart: on-failure:10
 
 volumes:
   db:
