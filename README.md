@@ -2,28 +2,39 @@
 
 [![Maintainability](https://qlty.sh/badges/1d96f9b0-00d7-47ce-bd3a-f03a36f33f8c/maintainability.svg)](https://qlty.sh/gh/irinakomarchenko/projects/user-service-spring-Apache-Kafka)
 
-# User Service & Notification Service
+# user-service-cloud-architecture
+
+### Микросервисная система управления пользователями и уведомлениями на Spring Boot, Kafka, Eureka, Docker и PostgreSQL.
 
 **User Service** — микросервис на Spring Boot для управления пользователями (CRUD) и публикации событий о создании/удалении пользователей в Kafka.
-**Notification-service** —  микросервис, который слушает события из Kafka и отправляет email-уведомления пользователям. Также предоставляет API для отправки email.
 
+**Notification-service** — микросервис, который слушает события из Kafka и отправляет email-уведомления пользователям. Также предоставляет API для отправки email.
+
+**Gateway API** — микросервис, реализующий единый точку входа в систему (API Gateway на Spring Cloud Gateway). Маршрутизирует HTTP-запросы к нужным микросервисам.
+
+**Discovery Server** — сервис регистрации и обнаружения (на базе Spring Cloud Eureka). Хранит реестр всех активных сервисов в системе, обеспечивает автоматическую маршрутизацию и отказоустойчивость.
+
+**Config Server** — централизованный сервер конфигурации (Spring Cloud Config). Управляет конфигурационными файлами для всех микросервисов из единого репозитория.
+
+**Kafka** — брокер сообщений (Apache Kafka), обеспечивает надёжную асинхронную передачу событий между сервисами.
+
+**Mailhog** — сервис для перехвата и просмотра тестовых email-сообщений через web-интерфейс. Используется для локальной отладки отправки писем.
+
+**PostgreSQL** — реляционная база данных для хранения информации о пользователях и событиях (используется user-service).
 
 ---
 
 ## Технологии
 
 - Java 22
-- Spring Boot
-- Spring Web (REST API)
-- Spring Data JPA (встроенный Hibernate)
-- Spring Kafka (Kafka Producer)
+- Spring Boot  (Spring Web, Spring Data JPA, Spring Kafka)
+- PostgreSQL (через Docker)
+- Apache Kafka (через Docker)
+- Spring Cloud (Gateway, Eureka Discovery, Config Server)
 - PostgreSQL (через Docker Compose)
-- Apache Kafka (интеграция через Spring Kafka)
-- SLF4J + Logback (логирование)
-- JUnit 5 + MockMvc (тестирование контроллеров и API)
-- Maven (сборка и зависимости)
-- Checkstyle (проверка стиля кода)
-- Lombok — (автогенерации геттеров/сеттеров)
+- JUnit 5, MockMvc (тестирование)
+- JLombok, SLF4J, Logback, Checkstyle
+- Docker (для контейнеризации сервисов)
 ---
 
 ## Запуск проекта
@@ -57,11 +68,34 @@ mvn verify
 
 ### 6. Запустить приложение
 
+#### Собрать артефакты (JAR-файлы) для каждого микросервиса:
 
 ```sh
 mvn clean package
-java -jar target/user-service-spring.jar
 ```
+#### Запустить все сервисы и инфраструктуру с помощью Docker Compose:
+```sh
+docker compose up -d
+```
+Все сервисы (user-service, notification-service, gateway, discovery-server, config-server, kafka, postgres, mailhog) будут подняты как отдельные контейнеры.
+
+#### Проверить статус контейнеров:
+```sh
+docker compose ps
+```
+
+#### Остановить все сервисы:
+```sh
+docker compose down
+```
+
+#### Для обновления jar-файлов после изменения кода пересоберите сервисы и перезапустите соответствующие контейнеры:
+```sh
+mvn clean package -DskipTests
+docker compose up --build -d
+```
+
+
 
 ### 7. Пример работы приложения
 ![img_1.png](readme-resources/img_1.png)
