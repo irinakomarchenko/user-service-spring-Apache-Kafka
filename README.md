@@ -98,8 +98,16 @@ docker compose up --build -d
 
 
 ### 7. Пример работы приложения
-![img_1.png](readme-resources/img_1.png)
-![img_2.png](readme-resources/img_2.png)
 
+#### PostgreSQL Demo
+![img_1.png](readme-resources/img_1.png)
+#### Eureka Demo
+![img_3.png](readme-resources/img_3.png)
+#### Mailhog Demo
+![img_4.png](readme-resources/img_4.png)
+
+#### Kafka, Mailhog Demo
 [![asciicast](https://asciinema.org/a/724889.svg)](https://asciinema.org/a/724889)
+#### Spring Cloud Microservices Demo
+[![asciicast](https://asciinema.org/a/726961.svg)](https://asciinema.org/a/726961)
 
