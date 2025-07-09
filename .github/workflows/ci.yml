@@ -28,44 +28,16 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build all services (skip tests)
-        run: mvn clean package -DskipTests
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
 
-      - name: Start services with Docker Compose
-        run: docker compose up --build -d
-
-      - name: Build and run tests (user-service)
+      - name: Build and run tests
         run: mvn verify
-        working-directory: ./user-service
 
-      - name: Build and run tests (notification-service)
-        run: mvn verify
-        working-directory: ./notification-service
-
-      - name: Upload JaCoCo report (user-service)
+      - name: Upload JaCoCo reports
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report-user-service
-          path: user-service/target/site/jacoco
-
-      - name: Upload JaCoCo report (notification-service)
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report-notification-service
-          path: notification-service/target/site/jacoco
-
-      - name: Run Checkstyle (user-service)
-        run: mvn checkstyle:check
-        working-directory: ./user-service
-
-      - name: Run Checkstyle (notification-service)
-        run: mvn checkstyle:check
-        working-directory: ./notification-service
-
-      - name: Tear down Docker Compose
-        if: always()
-        run: docker compose down --volumes
-
-      - name: Print Docker Compose logs
-        if: always()
-        run: docker compose logs
+          name: jacoco-reports
+          path: |
+            user-service/target/site/jacoco
+            notification-service/target/site/jacoco

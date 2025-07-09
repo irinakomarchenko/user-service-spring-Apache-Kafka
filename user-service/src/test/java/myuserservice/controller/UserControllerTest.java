@@ -10,10 +10,12 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 @Import(GlobalExceptionHandler.class)
+@ActiveProfiles("test")
 class UserControllerTest {
 
     @Autowired
@@ -33,17 +36,8 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockBean
     private UserService userService;
-
-    @TestConfiguration
-    static class MockConfig {
-        @Bean
-        public UserService userService() {
-            return Mockito.mock(UserService.class);
-        }
-    }
-
     @Test
     void testCreateUser() throws Exception {
         UserDto requestDto = UserDto.builder()
