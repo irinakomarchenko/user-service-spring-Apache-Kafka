@@ -68,8 +68,4 @@ jobs:
 
       - name: Print Docker Compose logs
         if: always()
-<<<<<<< HEAD
         run: docker compose logs
-=======
-        run: docker compose logs
->>>>>>> e4ee77c6ec7ad9cca8bffe16bc2fe69ea1a5091c
