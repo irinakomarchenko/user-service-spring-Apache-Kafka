@@ -34,7 +34,7 @@
 - PostgreSQL (через Docker Compose)
 - JUnit 5, MockMvc (тестирование)
 - JLombok, SLF4J, Logback, Checkstyle
-- Docker (для контейнеризации сервисов)
+- Docker (для контейнеризации сервисов) 
 ---
 
 ## Запуск проекта
